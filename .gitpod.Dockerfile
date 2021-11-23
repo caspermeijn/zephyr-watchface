@@ -17,7 +17,7 @@ RUN sudo apt update && \
       dtc --version
 
 # Get Zephyr and install Python dependencies
-RUN cd ~ && \
+RUN cd /tmp && \
       sudo pip3 install -U west && \
       west init ~/zephyrproject && \
       cd ~/zephyrproject && \
@@ -27,7 +27,7 @@ RUN cd ~ && \
       west --version
 
 # Install a Toolchain
-# RUN cd ~ && \
-#     wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.13.1/zephyr-sdk-0.13.1-linux-x86_64-setup.run && \
-#     chmod +x zephyr-sdk-0.13.1-linux-x86_64-setup.run && \
-#     ./zephyr-sdk-0.13.1-linux-x86_64-setup.run -- -d ~/zephyr-sdk-0.13.1
+RUN cd /tmp && \
+    wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.13.1/zephyr-sdk-0.13.1-linux-x86_64-setup.run && \
+    chmod +x zephyr-sdk-0.13.1-linux-x86_64-setup.run && \
+    ./zephyr-sdk-0.13.1-linux-x86_64-setup.run -- -d ~/zephyr-sdk-0.13.1
