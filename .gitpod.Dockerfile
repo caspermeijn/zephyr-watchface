@@ -1,6 +1,6 @@
 FROM gitpod/workspace-full-vnc
 
-ENV CUSTOM_XVFB_WxHxD=800x600x16
+ENV CUSTOM_XVFB_WxHxD=320x240x16
 
 # https://docs.zephyrproject.org/latest/getting_started/index.html
 # Install dependencies
@@ -16,18 +16,20 @@ RUN sudo apt update && \
       python3 --version && \
       dtc --version
 
+ENV PATH=~/.local/bin:$PATH
+ENV PYTHONUSERBASE=
 # Get Zephyr and install Python dependencies
-RUN cd /tmp && \
-      sudo pip3 install -U west && \
-      west init ~/zephyrproject && \
+RUN pip3 install --user -U west && \
+      echo 'export PATH=~/.local/bin:$PATH' >> ~/.bashrc &&\
+      ~/.local/bin/west init ~/zephyrproject && \
       cd ~/zephyrproject && \
-      west update && \
-      west zephyr-export && \
-      sudo pip3 install -r ~/zephyrproject/zephyr/scripts/requirements.txt && \
-      west --version
+      ~/.local/bin/west update && \
+      ~/.local/bin/west zephyr-export && \
+      pip3 install --user -r ~/zephyrproject/zephyr/scripts/requirements.txt && \
+      ~/.local/bin/west --version
 
 # Install a Toolchain
 RUN cd /tmp && \
-    wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.13.1/zephyr-sdk-0.13.1-linux-x86_64-setup.run && \
+    wget --no-verbose https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.13.1/zephyr-sdk-0.13.1-linux-x86_64-setup.run && \
     chmod +x zephyr-sdk-0.13.1-linux-x86_64-setup.run && \
     ./zephyr-sdk-0.13.1-linux-x86_64-setup.run -- -d ~/zephyr-sdk-0.13.1
