@@ -8,7 +8,6 @@ tasks:
       dtc --version
       west --version
   - command: |
-      cd ~/zephyrproject/zephyr/samples/subsys/display/cfb
       mkdir build
       cd build
       cmake -DBOARD=native_posix_64 -GNinja ..
