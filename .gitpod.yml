@@ -21,4 +21,6 @@ ports:
 
 vscode:
   extensions:
-    - "vivaxy.vscode-conventional-commits"
+    - vivaxy.vscode-conventional-commits
+    - ms-vscode.cmake-tools
+    - vscode.cpp
