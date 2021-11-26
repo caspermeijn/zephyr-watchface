@@ -8,6 +8,7 @@
 #include <device.h>
 #include <display/cfb.h>
 #include <stdio.h>
+#include <time.h>
 
 #if defined(CONFIG_SSD16XX)
 #define DISPLAY_DRIVER		"SSD16XX"
@@ -20,6 +21,28 @@
 #ifndef DISPLAY_DRIVER
 #define DISPLAY_DRIVER		"DISPLAY"
 #endif
+
+uint16_t center_coord(uint16_t full_size, uint16_t item_size) {
+	uint16_t center = full_size / 2 - item_size / 2;
+	return center - center % 8;
+}
+
+int time_str_hms(char buffer[9]) {
+	time_t t = time(NULL);
+	struct tm * lt = localtime(&t);
+
+	return snprintf(buffer, 9, "%02d:%02d:%02d", lt->tm_hour, lt->tm_min, lt->tm_sec);
+}
+
+int draw_time_center(const struct device *dev, uint16_t display_width, uint16_t display_height, uint8_t font_width, uint8_t font_height) {
+	char buffer[9];
+	int text_len = time_str_hms(buffer);
+
+	uint16_t x = center_coord(display_width, text_len * font_width);
+	uint16_t y = center_coord(display_height, font_height);
+
+	return cfb_print(dev, buffer, x, y);
+}
 
 void main(void)
 {
@@ -64,27 +87,24 @@ void main(void)
 		       font_width, font_height);
 	}
 
-	printf("x_res %d, y_res %d, ppt %d, rows %d, cols %d\n",
-	       cfb_get_display_parameter(dev, CFB_DISPLAY_WIDTH),
-	       cfb_get_display_parameter(dev, CFB_DISPLAY_HEIGH),
-	       ppt,
-	       rows,
-	       cfb_get_display_parameter(dev, CFB_DISPLAY_COLS));
+	uint16_t display_width = cfb_get_display_parameter(dev, CFB_DISPLAY_WIDTH);
+	uint16_t display_height = cfb_get_display_parameter(dev, CFB_DISPLAY_HEIGH);
 
 	while (1) {
 		for (int i = 0; i < rows; i++) {
 			cfb_framebuffer_clear(dev, false);
-			if (cfb_print(dev,
-				      "0123456789mMgj!\"§$%&/()=",
-				      0, i * ppt)) {
+
+			if (draw_time_center(dev,
+				      display_width, display_height,
+				      font_width, font_height)) {
 				printf("Failed to print a string\n");
+				k_sleep(K_MSEC(10000));
 				continue;
 			}
 
 			cfb_framebuffer_finalize(dev);
-#if defined(CONFIG_ARCH_POSIX)
-			k_sleep(K_MSEC(100));
-#endif
+
+			k_sleep(K_MSEC(1000));
 		}
 	}
 }
