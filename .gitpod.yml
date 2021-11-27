@@ -24,3 +24,4 @@ vscode:
     - vivaxy.vscode-conventional-commits
     - ms-vscode.cmake-tools
     - vscode.cpp
+    - twxs.cmake
