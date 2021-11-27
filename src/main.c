@@ -47,8 +47,6 @@ int draw_time_center(const struct device *dev, uint16_t display_width, uint16_t 
 void main(void)
 {
 	const struct device *dev;
-	uint16_t rows;
-	uint8_t ppt;
 	uint8_t font_width;
 	uint8_t font_height;
 
@@ -75,9 +73,6 @@ void main(void)
 
 	display_blanking_off(dev);
 
-	rows = cfb_get_display_parameter(dev, CFB_DISPLAY_ROWS);
-	ppt = cfb_get_display_parameter(dev, CFB_DISPLAY_PPT);
-
 	for (int idx = 0; idx < 42; idx++) {
 		if (cfb_get_font_size(dev, idx, &font_width, &font_height)) {
 			break;
@@ -91,20 +86,18 @@ void main(void)
 	uint16_t display_height = cfb_get_display_parameter(dev, CFB_DISPLAY_HEIGH);
 
 	while (1) {
-		for (int i = 0; i < rows; i++) {
-			cfb_framebuffer_clear(dev, false);
+		cfb_framebuffer_clear(dev, false);
 
-			if (draw_time_center(dev,
-				      display_width, display_height,
-				      font_width, font_height)) {
-				printf("Failed to print a string\n");
-				k_sleep(K_MSEC(10000));
-				continue;
-			}
-
-			cfb_framebuffer_finalize(dev);
-
-			k_sleep(K_MSEC(1000));
+		if (draw_time_center(dev,
+					display_width, display_height,
+					font_width, font_height)) {
+			printf("Failed to print a string\n");
+			k_sleep(K_MSEC(10000));
+			continue;
 		}
+
+		cfb_framebuffer_finalize(dev);
+
+		k_sleep(K_MSEC(1000));
 	}
 }
